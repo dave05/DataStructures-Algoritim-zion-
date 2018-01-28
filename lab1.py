@@ -10,18 +10,24 @@ def right(e):
 
 #a function check if a variable is the equation.
 def isInside(v,e):
-  if v==e[0] :
+  if v== left(e) :
       return True
   if len(e) <= 1:
       return False
   return isInside(v,left(e)) or isInside(v,right(e))
 
-def solve(v,f):
-    if isInside(v,f):
+def solve(v,g):
+    if isInside(v,g):
+        if isInside(v,right(g)):
+            #if the variable to solve is in right side rearrange the equation.
+            f = (right(g),op(g),left(g))
+        else:
+            f =g
         if v==left(f):
             #print("be here too", f)
             print(f)
         else:
+
             if op(left(f)) == '+':
                 solvingAdd(v,f)
             elif op(left(f)) == '-':
@@ -71,7 +77,10 @@ def solvingDivide(v,f):
     else:
         h=(right(left(f)),'=',(left(left(f)),'/',right(f)))
         solve(v,h)
-e = (('x','+','b'),'=','y')
-solve('x',e)
+
+
+
+#print(left(('y', '=', (('m', '*', 'x'), '+', 'b'))))
+#print(solve('x',e))
 #print(left(left(e)))
 #print(isInside('x',e))
