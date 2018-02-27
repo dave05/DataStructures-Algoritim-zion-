@@ -1,0 +1,698 @@
+
+<!-- saved from url=(0088)https://ay17.moodle.umn.edu/pluginfile.php/2105595/mod_resource/content/1/project1a.html -->
+<html class="gr__ay17_moodle_umn_edu"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <title>
+   CSci 1913 Programming Project 1
+  </title>
+  <style>
+   a:active
+    { color: purple;
+      font-weight: bold;
+      text-decoration: none }
+   a:link
+    { color: blue;
+      font-weight: bold;
+      text-decoration: none }
+   a:visited
+    { color: purple;
+      font-weight: bold;
+      text-decoration: none }
+   hr
+    { background-color: black;
+      border: none;
+      color: black;
+      height: 1px }
+   table
+    { border-collapse: collapse }
+  </style>
+ </head>
+ <body bgcolor="#FFFFFF" data-gr-c-s-loaded="true">
+  <p align="center">
+   <b>Programming Project 1</b>
+   <br>
+   <b>CS<small>CI</small> 1913: Introduction to Algorithms,</b>
+   <br>
+   <b>Data Structures, and Program Development</b>
+   <br>
+   <br>
+   <i>Last Revised February 8, 2018</i>
+  </p>
+  <p>
+   <b>0. Introduction.</b>
+  </p>
+  <p align="justify">
+   A <i>grammar</i> is a set of rules for generating strings. For this
+   project, you will write a Python program that generates random strings using
+   the rules of a grammar. For example, when the program was given the strings
+   of a grammar, it generated the following random sentences.
+  </p>
+  <blockquote>
+   <p>
+    <tt>the&nbsp;cat&nbsp;bit&nbsp;the&nbsp;dog&nbsp;.&nbsp;</tt>
+    <br>
+    <tt>the&nbsp;girl&nbsp;chased&nbsp;the&nbsp;boy&nbsp;.&nbsp;</tt>
+    <br>
+    <tt>the&nbsp;cat&nbsp;chased&nbsp;the&nbsp;boy&nbsp;and&nbsp;the&nbsp;boy&nbsp;kissed&nbsp;the&nbsp;cat&nbsp;.&nbsp;</tt>
+    <br>
+    <tt>the&nbsp;cat&nbsp;bit&nbsp;the&nbsp;dog&nbsp;and&nbsp;the&nbsp;dog&nbsp;kissed&nbsp;the&nbsp;girl&nbsp;and&nbsp;the&nbsp;dog&nbsp;chased&nbsp;the&nbsp;girl&nbsp;.</tt>
+   </p>
+  </blockquote>
+  <p align="justify">
+   Perhaps such grammars could write children's books automatically. Seriously,
+   however, more complex grammars have been used to generate random test inputs
+   for programs, as a debugging aid.
+  </p>
+  <p>
+   <b>1. Theory.</b>
+  </p>
+  <p align="justify">
+   To write this program, you must have a way to generate random integers. You
+   must also know what a grammar is, and how it works.
+  </p>
+  <p align="justify">
+   <b>Random integers.</b> No algorithm can generate truly random
+   integers, but it can generate <i>pseudo-random</i> integers that seem
+   random, even though they're not. Python has its own random number
+   generators, but for this project, you must implement your own.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The <i>Park-Miller algorithm</i> (named
+   for its inventors) is a simple way to generate a sequence of pseudo-random
+   integer terms. It works like this. Let <i>N</i>₀ be an integer
+   called the <i>seed</i>. The seed is the first term of the sequence, and
+   must be between 1 and 2³¹&nbsp;−&nbsp;2, inclusive. Starting
+   from the seed, later terms <i>N</i>₁, <i>N</i>₂, ...
+   are produced by the following equation.
+  </p>
+  <blockquote>
+   <p>
+    <i>N<sub>k</sub></i><sub>+1</sub> = (7<sup>5</sup>
+    <i>N<sub>k</sub></i>) <tt>%</tt> (2<sup>31</sup>
+    − 1)
+   </p>
+  </blockquote>
+  <p align="justify">
+   Here 7⁵ is 16807, and 2³¹ is 2147483648. The Python operator
+   <tt>%</tt> returns the remainder after dividing one integer by another.
+   You always get the same sequence of terms from a given seed. For example, if
+   you start with the seed 101, then you get a pseudo-random sequence whose
+   first few terms are 1697507, 612712738, 678900201, 695061696, 1738368639,
+   246698238, 1613847356, and 1214050682.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Terms in the sequence may be large, but you
+   can make them smaller by using the <tt>%</tt> operator again. If
+   <i>N</i> is a term from the sequence, then
+   <i>N</i>&nbsp;<tt>%</tt>&nbsp;<i>M</i> gives you an integer
+   between 0 and <i>M</i>&nbsp;−&nbsp;1, inclusive. For example, if
+   you need an integer between 0 and 9, then you write
+   <i>N</i>&nbsp;<tt>%</tt>&nbsp;10. You can use this to choose a
+   random element from a Python list or tuple. If <i>S</i> is the list or
+   tuple, then the Python expression
+   <i>S</i><tt>[</tt><i>N</i>&nbsp;<tt>%</tt>&nbsp;<tt>len(</tt><i>S</i><tt>)]</tt>
+   returns a randomly chosen element of <i>S</i>.
+  </p>
+  <p align="justify">
+   <b>Grammars.</b> The easiest way to explain a grammar is to show an
+   example. This is the grammar that generated the simple sentences about boys,
+   cats, dogs, and girls that appeared in the introduction.
+  </p>
+  <blockquote>
+   <table cellpadding="0" cellspacing="0">
+    <tbody><tr valign="top">
+     <td>
+      <p>
+       01&nbsp;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p align="right">
+       <i>Noun</i>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;→&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>'cat'</tt>&nbsp;
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p>
+       02&nbsp;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p align="right">
+       <i>Noun</i>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;→&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>'boy'</tt>&nbsp;
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p>
+       03&nbsp;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p align="right">
+       <i>Noun</i>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;→&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>'dog'</tt>&nbsp;
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p>
+       04&nbsp;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p align="right">
+       <i>Noun</i>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;→&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>'girl'</tt>&nbsp;
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p>
+       05&nbsp;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p align="right">
+       <i>Verb</i>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;→&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>'bit'</tt>&nbsp;
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p>
+       06&nbsp;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p align="right">
+       <i>Verb</i>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;→&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>'chased'</tt>&nbsp;
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p>
+       07&nbsp;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p align="right">
+       <i>Verb</i>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;→&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>'kissed'</tt>&nbsp;
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p>
+       08&nbsp;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p align="right">
+       <i>Phrase</i>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;→&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <tt>'the'</tt> <i>Noun Verb</i> <tt>'the'</tt>
+       <i>Noun</i>
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p>
+       09&nbsp;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p align="right">
+       <i>Story</i>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;→&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <i>Phrase</i>
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p>
+       10&nbsp;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p align="right">
+       <i>Story</i>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;→&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <i>Phrase</i> <tt>'and'</tt> <i>Story</i>
+      </p>
+     </td>
+    </tr>
+    <tr valign="top">
+     <td>
+      <p>
+       11&nbsp;&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p align="right">
+       <i>Start</i>
+      </p>
+     </td>
+     <td>
+      <p align="center">
+       &nbsp;&nbsp;→&nbsp;&nbsp;
+      </p>
+     </td>
+     <td>
+      <p>
+       <i>Story</i> <tt>'.'</tt>
+      </p>
+     </td>
+    </tr>
+   </tbody></table>
+  </blockquote>
+  <p align="justify">
+   Each line is a <i>rule,</i> identified by a number, so this grammar has
+   11 rules. The names in italics, like <i>Noun, Verb,</i> and
+   <i>Phrase,</i> are called <i>nonterminals.</i> The strings in
+   quotes, like <tt>'girl'</tt>, <tt>'the'</tt> and
+   <tt>'.'</tt>, are called <i>terminals.</i> In each rule, the
+   arrow `→' means <i>may be replaced by</i>. As a result, rule 01
+   says that the nonterminal <i>Noun</i> may be replaced by the string
+   <tt>'cat'</tt>. Similarly, rule 10 says that the nonterminal
+   <i>Story</i> may be replaced by the nonterminal <i>Phrase</i>,
+   followed by the string <tt>'and'</tt>, followed by the nonterminal
+   <i>Story</i>.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; To generate strings from the grammar, you
+   play a little game. The game always begins with the nonterminal
+   <i>Start</i>. The object of the game is to use the rules to get rid of
+   the nonterminals, replacing them by terminals. If you can do that, then the
+   terminals left over at the end are concatenated to produce a string
+   generated by the grammar. For example, you begin with <i>Start</i> and
+   use rule 11 to replace it, like this.
+  </p>
+  <blockquote>
+   <p>
+    <i>Story</i> <tt>'.'</tt>
+   </p>
+  </blockquote>
+  <p align="justify">
+   Now you have a new nonterminal, <i>Story</i>, to get rid of. According
+   to rule 10, you can replace <i>Story</i> by
+   <i>Phrase</i>&nbsp;<tt>'and'</tt>&nbsp;<i>Story</i>, so
+   you get this.
+  </p>
+  <blockquote>
+   <p>
+    <i>Phrase</i> <tt>'and'</tt> <i>Story</i>
+    <tt>'.'</tt>
+   </p>
+  </blockquote>
+  <p align="justify">
+   You can then use rule 09 to replace <i>Story</i> by <i>Phrase</i>.
+  </p>
+  <blockquote>
+   <p>
+    <i>Phrase</i> <tt>'and'</tt> <i>Phrase</i>
+    <tt>'.'</tt>
+   </p>
+  </blockquote>
+  <p align="justify">
+   You use rule 08 to replace the first <i>Phrase</i>, so you get this.
+  </p>
+  <blockquote>
+   <p>
+    <tt>'the'</tt> <i>Noun Verb</i> <tt>'the'</tt>
+    <i>Noun</i> <tt>'and'</tt> <i>Phrase</i>
+    <tt>'.'</tt>
+   </p>
+  </blockquote>
+  <p align="justify">
+   According to rule 01, you can replace the first <i>Noun</i> by
+   <tt>'cat'</tt>, and according to rule 02, you can replace the
+   second <i>Noun</i> by <tt>'boy'</tt>.
+  </p>
+  <blockquote>
+   <p>
+    <tt>'the' 'cat'</tt> <i>Verb</i> <tt>'the' 'boy'
+    'and'</tt> <i>Phrase</i> <tt>'.'</tt>
+   </p>
+  </blockquote>
+  <p align="justify">
+   And according to rule 06, you can replace <i>Verb</i> by
+   <tt>'chased'</tt>.
+  </p>
+  <blockquote>
+   <p>
+    <tt>'the' 'cat' 'chased' 'the' 'boy' 'and'</tt>
+    <i>Phrase</i> <tt>'.'</tt>
+   </p>
+  </blockquote>
+  <p align="justify">
+   Continuing the game, you use rule 08 again to replace <i>Phrase.</i>
+  </p>
+  <blockquote>
+   <p>
+    <tt>'the' 'cat' 'chased' 'the' 'boy' 'and' 'the'</tt> <i>Noun
+    Verb</i> <tt>'the'</tt> <i>Noun</i>
+    <tt>'.'</tt>
+   </p>
+  </blockquote>
+  <p align="justify">
+   You use rule 02 to replace the first <i>Noun</i> by
+   <tt>'boy'</tt>, and use rule 01 to replace the second
+   <i>Noun</i> by <tt>'cat'</tt>. Finally, you use rule 07 to
+   replace <i>Verb</i> by <tt>'kissed'</tt>.
+  </p>
+  <blockquote>
+   <p>
+    <tt>'the' 'cat' 'chased' 'the' 'boy' 'and' 'the' 'boy' 'kissed' 'the'
+    'cat' '.'</tt>
+   </p>
+  </blockquote>
+  <p align="justify">
+   At this point, you've eliminated all the nonterminals, so you've won the
+   game. If you concatenate all the strings together, separated by blanks, then
+   you get a string generated by the grammar, like this:
+  </p>
+  <blockquote>
+   <p>
+    <tt>'the cat chased the boy and the boy kissed the cat .'</tt>
+   </p>
+  </blockquote>
+  <p align="justify">
+   By the way, there are many different kinds of grammars, each with different
+   kinds of rules. The grammars used for this project are called
+   <i>context-free grammars,</i> in which each rule has a single
+   nonterminal on the left side of the arrow `→'.
+  </p>
+  <p>
+   <b>2. Implementation.</b>
+  </p>
+  <p align="justify">
+   The grammar game described in the previous section is so simple that a short
+   Python program can play it. You must implement such a program for this
+   project. Your program must have two Python classes, <tt>Random</tt> and
+   <tt>Grammar</tt>. Neither class extends the other.
+  </p>
+  <p align="justify">
+   <b>The class <tt>Random</tt>.</b> The first class must be called
+   <tt>Random</tt>, and it must implement the Park-Miller algorithm. It
+   must have the following methods. They must have the same parameters as
+   described here, and they must also work as described here.
+  </p>
+  <dl compact="compact">
+   <dt>
+    <p>
+     <tt>__init__(self, seed)</tt>
+    </p>
+   </dt>
+   <dd>
+    <p align="justify">
+     (5 points.) Initialize an instance of <tt>Random</tt> so it generates
+     the sequence of pseudo-random integers that begin with <tt>seed</tt>.
+     You may assume that <tt>seed</tt> is an integer in the proper range
+     for the Park-Miller algorithm to work.
+    </p>
+   </dd>
+   <dt>
+    <p>
+     <tt>next(self)</tt>
+    </p>
+   </dt>
+   <dd>
+    <p align="justify">
+     (5 points.) Generate the next random integer in the sequence, and return
+     it.
+    </p>
+   </dd>
+   <dt>
+    <p>
+     <tt>choose(self, objects)</tt>
+    </p>
+   </dt>
+   <dd>
+    <p align="justify">
+     (5 points.) Choose an element from the tuple <tt>objects</tt> at
+     random, using an index obtained by calling <tt>next</tt>. Return that
+     element. You may assume that <tt>objects</tt> is a tuple with at
+     least one element.
+    </p>
+   </dd>
+  </dl>
+  <p align="justify">
+   Your <tt>Random</tt> class must not compute big numbers like 7⁵
+   and 2³¹ over and over again. Either compute them only once, and
+   store them in variables, or else write them as constants, so you don't have
+   to compute them at all.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; The methods in <tt>Random</tt> are very
+   short, just one or two lines each. If your methods are much longer than
+   that, then you do not understand what you are doing, and you should ask for
+   help.
+  </p>
+  <p align="justify">
+   <b>The class <tt>Grammar</tt>.</b> The second class must be called
+   <tt>Grammar</tt>, and it must implement a grammar with rules like those
+   described in the previous section. The class <tt>Grammar</tt> must have
+   the following methods. They must have the same parameters as described here,
+   and they must also work as described here.
+  </p>
+  <dl compact="compact">
+   <dt>
+    <p>
+     <tt>__init__(self, seed)</tt>
+    </p>
+   </dt>
+   <dd>
+    <p align="justify">
+     (5 points.) Initialize an instance of <tt>Grammar</tt>. It must have
+     an instance of the random number generator <tt>Random</tt> that uses
+     <tt>seed</tt>. It must also have a dictionary that stores rules.
+    </p>
+   </dd>
+   <dt>
+    <p>
+     <tt>rule(self, left, right)</tt>
+    </p>
+   </dt>
+   <dd>
+    <p align="justify">
+     (5 points.) Add a new rule to the grammar. Here <tt>left</tt> is a
+     string. It represents the nonterminal on the left side of the rule. Also,
+     <tt>right</tt> is a tuple whose elements are strings. They represent
+     the terminals and nonterminals on the right side of the rule.
+     <br>
+     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Find the value of <tt>left</tt> in the
+     dictionary. If there is no such value, then let the value of
+     <tt>left</tt> in the dictionary be a list whose only element is
+     <tt>right</tt>. However, if there is such a value, then it will be a
+     list. Add <tt>right</tt> to the end of that list.
+    </p>
+   </dd>
+   <dt>
+    <p>
+     <tt>generate(self)</tt>
+    </p>
+   </dt>
+   <dd>
+    <p align="justify">
+     (5 points.) Generate a string. If there is a rule with the right side
+     <tt>'Start'</tt> in the dictionary, then call
+     <tt>generating</tt> with the tuple <tt>('Start',)</tt> as
+     its argument, and return the result. If there is no such rule, then raise
+     an exception, because you can't generate strings without a rule for
+     <tt>'Start'</tt>.
+    </p>
+   </dd>
+   <dt>
+    <p>
+     <tt>generating(self, strings)</tt>
+    </p>
+   </dt>
+   <dd>
+    <p align="justify">
+     (10 points.) This method does all the work for the program. The parameter
+     <tt>strings</tt> is a tuple whose elements are strings. The strings
+     represent terminals and nonterminals.
+     <br>
+     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Initialize a local variable to
+     <tt>''</tt>, the empty string. It will hold the result to be
+     returned by this method. Now visit each string in <tt>strings</tt>,
+     using a loop.
+     <br>
+     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If the visited string is not a key in the
+     dictionary, then it is a terminal. Simply concatenate it to the end of the
+     result string, followed by a blank <tt>' '</tt>.
+     <br>
+     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; If the visited string is a key in the
+     dictionary, then it is a nonterminal. That means its value in the
+     dictionary is a list, created by the method <tt>rule</tt>. Get that
+     list from the dictionary. Choose one of its elements at random. The chosen
+     element will be a tuple of strings. Call <tt>generating</tt>
+     recursively with the chosen tuple as its argument. The call will return a
+     string. Concatenate that string to the end of the result string, but
+     without a blank at the end.
+     <br>
+     &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Continue in this way until all elements of
+     the tuple have been visited. Then return the result string.
+    </p>
+   </dd>
+  </dl>
+  <p align="justify">
+   For example, the following Python code creates an instance <tt>G</tt>
+   of the class <tt>Grammar</tt>. It has the rules of the example grammar
+   that was described earlier.
+  </p>
+  <blockquote>
+   <p>
+    <tt>G&nbsp;=&nbsp;Grammar(101)&nbsp;</tt>
+    <br>
+    <tt>G.rule('Noun',&nbsp;&nbsp;&nbsp;('cat',))&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;&nbsp;01&nbsp;</tt>
+    <br>
+    <tt>G.rule('Noun',&nbsp;&nbsp;&nbsp;('boy',))&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;&nbsp;02&nbsp;</tt>
+    <br>
+    <tt>G.rule('Noun',&nbsp;&nbsp;&nbsp;('dog',))&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;&nbsp;03&nbsp;</tt>
+    <br>
+    <tt>G.rule('Noun',&nbsp;&nbsp;&nbsp;('girl',))&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;&nbsp;04&nbsp;</tt>
+    <br>
+    <tt>G.rule('Verb',&nbsp;&nbsp;&nbsp;('bit',))&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;&nbsp;05&nbsp;</tt>
+    <br>
+    <tt>G.rule('Verb',&nbsp;&nbsp;&nbsp;('chased',))&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;&nbsp;06&nbsp;</tt>
+    <br>
+    <tt>G.rule('Verb',&nbsp;&nbsp;&nbsp;('kissed',))&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;&nbsp;07&nbsp;</tt>
+    <br>
+    <tt>G.rule('Phrase',&nbsp;('the',&nbsp;'Noun',&nbsp;'Verb',&nbsp;'the',&nbsp;'Noun'))&nbsp;&nbsp;#&nbsp;&nbsp;08&nbsp;</tt>
+    <br>
+    <tt>G.rule('Story',&nbsp;&nbsp;('Phrase',))&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;&nbsp;09&nbsp;</tt>
+    <br>
+    <tt>G.rule('Story',&nbsp;&nbsp;('Phrase',&nbsp;'and',&nbsp;'Story'))&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;&nbsp;10&nbsp;</tt>
+    <br>
+    <tt>G.rule('Start',&nbsp;&nbsp;('Story',&nbsp;'.'))&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;#&nbsp;&nbsp;11</tt>
+   </p>
+  </blockquote>
+  <p align="justify">
+   Remember that a tuple with exactly one element <i>e</i> must be written
+   as <tt>(</tt><i>e</i><tt>,)</tt> with an extra comma at the
+   end. If you leave off the extra comma, then you get
+   <tt>(</tt><i>e</i><tt>)</tt> which is the same as
+   <i>e</i>. Leaving off that comma may make your program do crazy
+   things—this can be a very hard mistake to find.
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; In the example, <tt>G</tt>'s random
+   number generator is initialized with the seed 101. If you continue the
+   example by calling <tt>G.generate()</tt> four times, then you should
+   get the same four sentences that appear in the introduction.
+  </p>
+  <p>
+   <b>3. Deliverables.</b>
+  </p>
+  <p align="justify">
+   This project is worth 40 points. It will be due in about two weeks, at
+   <b>11:55 <small>PM</small></b> on <b>Monday, February 26,
+   2018.</b> Unlike the lab assignments, you are not allowed to work with
+   others on this project. <b>I<small>T MUST BE WRITTEN ENTIRELY BY
+   YOURSELF ALONE</small>!</b>
+   <br>
+   &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; You must turn in Python source code for (1)
+   the class <tt>Random</tt>, (2) the class <tt>Grammar</tt>, and (3)
+   enough tests and output to convince yourself and the TA's that it works
+   correctly. Turn in only one file. Append the tests and output to the bottom
+   of the file as comments, and submit it to Moodle. If you don't know how or
+   where to submit your work, then ask one of your lab TA's.
+  </p>
+ 
+
+</body></html>
