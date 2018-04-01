@@ -1,0 +1,105 @@
+
+public class Map<Key, Value> {
+	
+	private Key [] Keys;
+	
+	private Value [] Values;
+	
+	private int count;
+	
+   
+
+public Map(int length) {
+	
+
+
+           if(length<0){
+
+         throw new IllegalArgumentException("invalid length");
+}
+
+    Keys = (Key[])new Object[length];
+
+     Values = (Value[])new Object[length];
+
+           count =0;
+		}
+
+	public Value get(Key key)	{
+		
+	
+	for(int index=0; index<count; index++)	
+		{
+
+       if(isEqual(Keys[index],key))
+
+            return Values[index];
+
+     }
+
+     throw new IllegalArgumentException();
+
+}
+
+
+	private boolean isEqual(Key leftKey, Key rightKey) {
+		
+		
+		if(leftKey!=null && rightKey !=null) {
+		   
+			
+		return leftKey.equals(rightKey);
+		}
+		
+		
+		
+			return (leftKey==rightKey);
+		
+	}
+	
+	public boolean isIn(Key key)
+	
+	{
+	for(int index=0; index<count; index++)
+		
+	{
+		if(isEqual(Keys[index],key))
+		{
+			return true;
+		}
+		
+	}
+	return false;
+	
+	}
+	public void put(Key key, Value value)
+	{
+		int index = where(key);
+		if(index==-1)
+		{
+			if (count == Keys.length)
+				throw new IllegalStateException("map is full");
+		}
+		
+		else
+		{
+			Keys[count]=key;
+			Values[count] = value;
+			
+			count++;
+		}
+	}
+		
+	private int where(Key key) {
+	for(int index=0; index<count; index++) {
+		
+		if(isEqual(this.Keys[index],key)) {
+			return index;
+		}
+	}
+	
+return -1;
+}
+		
+
+}
